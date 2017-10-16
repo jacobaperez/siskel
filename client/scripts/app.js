@@ -100,8 +100,8 @@ var MovieView = Backbone.View.extend({
 var MoviesView = Backbone.View.extend({
 
   initialize: function() {
-    // When the comparator is changed, re-render the collection
-    this.collection.on('change:comparator', this.render(), this);
+    // When the collection is sorted re-render the collection
+    this.collection.on('sort', this.render, this);
 
   },
 
