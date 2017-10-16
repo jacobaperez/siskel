@@ -6,8 +6,8 @@ var Movie = Backbone.Model.extend({
 
   toggleLike: function() {
     // your code here
+    this.set('like', !this.get('like'));
   }
-
 });
 
 var Movies = Backbone.Collection.extend({
@@ -16,12 +16,23 @@ var Movies = Backbone.Collection.extend({
 
   initialize: function() {
     // your code here
+    // Default sort is by title, when you click like -> re-sort
+      this.on('change:like', function(){
+        console.log('Liked');
+        console.log(this);
+        this.sort();
+      }, this);
   },
 
   comparator: 'title',
 
   sortByField: function(field) {
-    // your code here
+
+    // update the comparator to whatever field is selected (since collection is sorted by the comparator)
+    // sort the collection
+    this.comparator = field;
+    // Sort by specific field.
+    this.sort(field);
   }
 
 });
@@ -34,6 +45,7 @@ var AppView = Backbone.View.extend({
 
   handleClick: function(e) {
     var field = $(e.target).val();
+    console.log('clicked', field);
     this.collection.sortByField(field);
   },
 
@@ -59,6 +71,13 @@ var MovieView = Backbone.View.extend({
 
   initialize: function() {
     // your code here
+    // When a movie's like is clicked, render the change
+    this.model.on('change:like', function(){
+        console.log('Render Ran');
+        // this.model.render();
+        this.render();
+
+    }, this)
   },
 
   events: {
@@ -66,6 +85,8 @@ var MovieView = Backbone.View.extend({
   },
 
   handleClick: function() {
+    // When the particular movie model is clicked, toggle the like
+      this.model.toggleLike();
     // your code here
   },
 
@@ -79,7 +100,9 @@ var MovieView = Backbone.View.extend({
 var MoviesView = Backbone.View.extend({
 
   initialize: function() {
-    // your code here
+    // When the comparator is changed, re-render the collection
+    this.collection.on('change:comparator', this.render(), this);
+
   },
 
   render: function() {
